@@ -1,0 +1,33 @@
+{
+  "name": "datapantry",
+  "version": "0.1.0",
+  "description": "JavaScript client for DataPantry databases",
+  "keywords": [
+    "database",
+    "api",
+    "sqlite",
+    "client"
+  ],
+  "homepage": "https://github.com/benholland1024/DataPantry#readme",
+  "bugs": {
+    "url": "https://github.com/benholland1024/DataPantry/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/benholland1024/DataPantry.git"
+  },
+  "license": "MIT",
+  "author": "Ben Holland",
+  "type": "module",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "prepublishOnly": "npm run build",
+    "test": "npm run build && node test/test.js"
+  },
+  "devDependencies": {
+    "@types/node": "^24.6.2",
+    "dotenv": "^17.2.3",
+    "typescript": "^5.9.3"
+  }
+}
