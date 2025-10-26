@@ -104,6 +104,7 @@ class QueryBuilder {
   }
 
   protected async execute() {
+    console.log("Executing query:", this.query, "with params:", this.params)
     return await this.db.sql(this.query, ...this.params)
   }
 
@@ -170,11 +171,17 @@ class SelectQueryBuilder extends QueryBuilder {
   }
 
   join(table: string, condition: string) {
+    if (!/^[\w.\s=<>!]+$/.test(condition)) {
+      throw new Error('Invalid JOIN condition')
+    }
     this.query += ` INNER JOIN "${table}" ON ${condition}`
     return this
   }
 
   leftJoin(table: string, condition: string) {
+    if (!/^[\w.\s=<>!]+$/.test(condition)) {
+      throw new Error('Invalid LEFT JOIN condition')
+    }
     this.query += ` LEFT JOIN "${table}" ON ${condition}`
     return this
   }
@@ -194,11 +201,17 @@ class SelectQueryBuilder extends QueryBuilder {
 
 // INSERT query builder
 class InsertQueryBuilder extends QueryBuilder {
+  private replaceMode = false
   private table: string
 
   constructor(db: DataPantryDatabase, table: string) {
     super(db)
     this.table = table
+  }
+
+  orReplace() {
+    this.replaceMode = true
+    return this
   }
 
   values(data: any | any[]) {
@@ -210,7 +223,8 @@ class InsertQueryBuilder extends QueryBuilder {
       `(${columns.map(() => '?').join(', ')})`
     ).join(', ')
 
-    this.query = `INSERT INTO "${this.table}" (${columnNames}) VALUES ${valuePlaceholders}`
+    const insertType = this.replaceMode ? 'INSERT OR REPLACE' : 'INSERT'
+    this.query = `${insertType} INTO "${this.table}" (${columnNames}) VALUES ${valuePlaceholders}`
     
     // Flatten all values into params array
     rows.forEach(row => {

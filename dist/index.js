@@ -84,6 +84,7 @@ class QueryBuilder {
         this.db = db;
     }
     async execute() {
+        console.log("Executing query:", this.query, "with params:", this.params);
         return await this.db.sql(this.query, ...this.params);
     }
     // Make it thenable (Promise-like)
@@ -141,10 +142,16 @@ class SelectQueryBuilder extends QueryBuilder {
         return this;
     }
     join(table, condition) {
+        if (!/^[\w.\s=<>!]+$/.test(condition)) {
+            throw new Error('Invalid JOIN condition');
+        }
         this.query += ` INNER JOIN "${table}" ON ${condition}`;
         return this;
     }
     leftJoin(table, condition) {
+        if (!/^[\w.\s=<>!]+$/.test(condition)) {
+            throw new Error('Invalid LEFT JOIN condition');
+        }
         this.query += ` LEFT JOIN "${table}" ON ${condition}`;
         return this;
     }
